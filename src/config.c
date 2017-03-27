@@ -2,7 +2,7 @@
 
 #define HTCPCP_OPTS "a:p:d"
 
-Config *config_new()
+Config *config_new(void)
 {
     Config *config = malloc(sizeof(Config));
 
@@ -11,6 +11,7 @@ Config *config_new()
         config->is_server = 0;
         config->address = NULL;
         config->port = 0;
+        config->connection_queue_length = DEFAULT_CONNECTION_QUEUE_LENGTH;
     }
 
     return config;
@@ -32,9 +33,17 @@ int parse_opts(Config *config, int argc, char **argv)
                 sprintf(config->address, "%s", optarg);
                 break;
 
-            case 'p':
-                config->port = atoi(optarg);
+            case 'p': {
+                int port = atoi(optarg);
+                if(port <= 0 || port > 65535)
+                {
+                    fprintf(stderr, "[-] Port value cannot be lower or equals to 0 nor greater than 65535. Provided value is: %d\n", port);
+                    return 0;
+                }
+
+                config->port = (unsigned short)port;
                 break;
+            }
 
             case 'd':
                 config->is_server = 1;
@@ -42,9 +51,9 @@ int parse_opts(Config *config, int argc, char **argv)
 
             case '?':
                 if(optopt == 'a' || optopt == 'p')
-                    fprintf(stderr, "Option -%c requires an argument\n", optopt);
+                    fprintf(stderr, "[-] Option -%c requires an argument\n", optopt);
                 else
-                    fprintf(stderr, "Unknown option '-%c'\n", optopt);
+                    fprintf(stderr, "[-] Unknown option '-%c'\n", optopt);
                 return 0;
 
             default:

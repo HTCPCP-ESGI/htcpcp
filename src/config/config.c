@@ -1,4 +1,4 @@
-#include "htcpcp.h"
+#include "../htcpcp.h"
 
 #define HTCPCP_OPTS "a:p:d"
 

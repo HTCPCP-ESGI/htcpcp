@@ -12,8 +12,11 @@
 #include <unistd.h>
 #include <getopt.h>
 
-#include "headers/config.h"
-#include "headers/client.h"
-#include "headers/server.h"
+#include "list/List.h"
+
+#include "config/config.h"
+
+#include "network/client.h"
+#include "network/server.h"
 
 #endif

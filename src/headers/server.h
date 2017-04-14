@@ -9,7 +9,8 @@ typedef struct Server {
 } Server;
 
 Server *server_new(void);
-int server_init(Server*, Config*);
+void server_init(Server*, Config*);
+int server_listen(Server*, Config*);
 void server_run(Server*);
 void server_free(Server*);
 

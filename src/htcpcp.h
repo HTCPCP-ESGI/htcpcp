@@ -13,6 +13,7 @@
 #include <getopt.h>
 
 #include "headers/config.h"
+#include "headers/client.h"
 #include "headers/server.h"
 
 #endif

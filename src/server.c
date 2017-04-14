@@ -14,13 +14,16 @@ Server *server_new(void)
     return server;
 }
 
-int server_init(Server *server, Config *config)
+void server_init(Server *server, Config *config)
 {
     // Init the server address
     server->address.sin_family = AF_INET;
     server->address.sin_addr.s_addr = inet_addr(config->address);
     server->address.sin_port = htons(config->port);
+}
 
+int server_listen(Server *server, Config *config)
+{
     // Init the server socket
     server->socket = socket(AF_INET, SOCK_STREAM, 0);
     if(server->socket == -1)
@@ -50,11 +53,36 @@ int server_init(Server *server, Config *config)
 
 void server_run(Server *server)
 {
-    // TODO
+    while(1)
+    {
+        Client *client = client_new();
+        client->socket = accept(server->socket, &client->address, &client->addr_len);
+
+        int is_parent = fork();
+
+        if(is_parent)
+            continue;
+
+        while(1)
+        {
+            read(client->socket, client->buffer, CLIENT_BUFFER_SIZE);
+
+            // Cleanup client on "exit"
+            if(!strcmp(client->buffer, "exit\n"))
+            {
+                client_free(client);
+                exit(0);
+            }
+
+            printf("Client says > %s\n", client->buffer);
+            write(client->socket, client->buffer, strlen(client->buffer) + 1);
+        }
+    }
 }
 
 void server_free(Server *server)
 {
-    close(server->socket);
+    if(server->socket)
+        close(server->socket);
     free(server);
 }

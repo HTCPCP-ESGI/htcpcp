@@ -20,7 +20,7 @@ void server_init(Server *server, Config *config)
 {
     // Init the server address
     server->address.sin_family = AF_INET;
-    server->address.sin_addr.s_addr = inet_addr(config->address);
+    server->address.sin_addr.s_addr = (config->is_server) ? htons(INADDR_ANY) : inet_addr(config->address);
     server->address.sin_port = htons(config->port);
 }
 
@@ -57,8 +57,8 @@ void server_run(Server *server)
 {
     while(1)
     {
-        server_forked(server);
-        //server_multiplexed(server);
+        //server_forked(server);
+        server_multiplexed(server);
     }
 }
 

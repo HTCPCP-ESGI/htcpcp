@@ -24,6 +24,9 @@ Request *request_new(const char *raw)
 
 int parse_request(Request *request, const char *raw)
 {
+    if(!request || !raw)
+        return 0;
+
     int method_parsed = 0;
 
     char *str = strdup(raw);
@@ -65,6 +68,9 @@ int parse_request(Request *request, const char *raw)
 
 int parse_method(Request *request, char *line)
 {
+    if(!request || !line)
+        return 0;
+
     char *index = strpbrk(line, " ");
 
     if(!index)
@@ -84,6 +90,9 @@ int parse_method(Request *request, char *line)
 
 int parse_header(Request *request, char *line)
 {
+    if(!request || !line)
+        return 0;
+
     char *index = strpbrk(line, ":");
 
     if(!index)
@@ -117,4 +126,15 @@ int parse_header(Request *request, char *line)
     map_put(request->headers, key, &values, sizeof(values));
 
     return 1;
+}
+
+void request_free(Request *request)
+{
+    if(!request)
+        return;
+
+    free(request->method);
+    free(request->resource);
+    map_free(&request->headers);
+    free(request->body);
 }

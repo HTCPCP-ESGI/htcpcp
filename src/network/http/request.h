@@ -1,5 +1,5 @@
-#ifndef HTTP_H
-#define HTTP_H
+#ifndef REQUEST_H
+#define REQUEST_H
 
 typedef struct Request {
     char *method;
@@ -9,5 +9,6 @@ typedef struct Request {
 } Request;
 
 Request *request_new(const char*);
+void request_free(Request*);
 
 #endif

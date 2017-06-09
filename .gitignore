@@ -1,4 +1,5 @@
 .idea/
 *.o
+*.stackdump
 bin/
 cmake-build-debug/

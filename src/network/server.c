@@ -101,6 +101,7 @@ void server_multiplexed(Server *server)
 
     while(clients)
     {
+        printf(" +1 Client\n");
         Client *client = (Client*) clients->value;
         FD_SET(client->socket, &readfs);
 
@@ -110,7 +111,9 @@ void server_multiplexed(Server *server)
         clients = clients->next;
     }
 
+    printf("Before select\n");
     int res = select(max_fd + 1, &readfs, NULL, NULL, NULL);
+    printf("After select\n");
 
     if(!res)
     {
@@ -131,12 +134,13 @@ void server_multiplexed(Server *server)
     {
         Client *client = (Client*) clients->value;
 
+        // TODO: server abort (core dump) on client ^C
         if(FD_ISSET(client->socket, &readfs))
         {
-            read(client->socket, client->buffer, CLIENT_BUFFER_SIZE);
+            int read_value = read(client->socket, client->buffer, CLIENT_BUFFER_SIZE);
 
-            // Cleanup client on "exit"
-            if(!strcmp(client->buffer, "exit\n"))
+            // Cleanup client on read error or "exit"
+            if(read_value == -1 || !read_value || !strcmp(client->buffer, "exit\n"))
             {
                 client_free(client);
                 clients = clients->next;

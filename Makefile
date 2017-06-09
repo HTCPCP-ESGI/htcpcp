@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -Wextra -std=c11 -pedantic-errors -O3
+CFLAGS=-Wall -Wextra -std=gnu11 -pedantic-errors -O3
 LDFLAGS=
 
 SRC=$(shell find . -name *.c)

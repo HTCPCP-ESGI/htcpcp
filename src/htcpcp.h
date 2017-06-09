@@ -14,9 +14,13 @@
 #include <getopt.h>
 
 #include "list/List.h"
+#include "map/HashMapEntry.h"
+#include "map/HashMap.h"
 
 #include "config/config.h"
 
+#include "network/http/request.h"
+#include "network/http/response.h"
 #include "network/client.h"
 #include "network/server.h"
 

@@ -57,8 +57,8 @@ void server_run(Server *server)
 {
     while(1)
     {
-        //server_forked(server);
-        server_multiplexed(server);
+        server_forked(server);
+        //server_multiplexed(server);
     }
 }
 
@@ -70,7 +70,7 @@ void server_forked(Server *server)
     int is_parent = fork();
 
     if(is_parent)
-        continue;
+        return;
 
     while(1)
     {

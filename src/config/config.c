@@ -21,7 +21,7 @@ int parse_opts(Config *config, int argc, char **argv)
 {
     char opt;
 
-    if(!config || argc < 1 || !argv)
+    if(!config || argc < 2 || !argv)
         return 0;
 
     while((opt = getopt(argc, argv, HTCPCP_OPTS)) != -1)

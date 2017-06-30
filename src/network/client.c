@@ -1,4 +1,4 @@
-#include "../htcpcp.h"
+#include "../includes.h"
 
 Client *client_new(void)
 {
@@ -31,19 +31,12 @@ int client_connect(Client *client, Server *server)
 
 void client_run(Client *client)
 {
-    while(1)
-    {
-        fgets(client->buffer, CLIENT_BUFFER_SIZE, stdin);
-        printf("[+] Input: %s\n", client->buffer);
-        write(client->socket, client->buffer, strlen(client->buffer) + 1);
+    fgets(client->buffer, CLIENT_BUFFER_SIZE, stdin);
+    printf("[+] Input: %s", client->buffer);
+    write(client->socket, client->buffer, strlen(client->buffer) + 1);
 
-        // Break loop on "exit"
-        if(!strcmp(client->buffer, "exit\n"))
-            break;
-
-        read(client->socket, client->buffer, CLIENT_BUFFER_SIZE);
-        printf("Server says > %s\n", client->buffer);
-    }
+    read(client->socket, client->buffer, CLIENT_BUFFER_SIZE);
+    printf("[+] Server says > %s", client->buffer);
 }
 
 void client_free(Client *client)

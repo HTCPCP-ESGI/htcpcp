@@ -1,6 +1,6 @@
-#include "../htcpcp.h"
+#include "../includes.h"
 
-Server *server_new(void)
+Server *server_new(HtcpcpProtocol protocol)
 {
     Server *server = malloc(sizeof(Server));
 
@@ -11,6 +11,7 @@ Server *server_new(void)
         server->socket = 0;
 
         server->clients = NULL;
+        server->protocol = protocol;
     }
 
     return server;
@@ -57,8 +58,8 @@ void server_run(Server *server)
 {
     while(1)
     {
-        //server_forked(server);
-        server_multiplexed(server);
+        server_forked(server);
+        //server_multiplexed(server);
     }
 }
 
@@ -68,24 +69,18 @@ void server_forked(Server *server)
     client->socket = accept(server->socket, &client->address, &client->addr_len);
 
     int is_parent = fork();
-
     if(is_parent)
         return;
 
-    while(1)
-    {
-        read(client->socket, client->buffer, CLIENT_BUFFER_SIZE);
+    read(client->socket, client->buffer, CLIENT_BUFFER_SIZE);
+    printf("[+] Client says > %s", client->buffer);
 
-        // Cleanup client on "exit"
-        if(!strcmp(client->buffer, "exit\n"))
-        {
-            client_free(client);
-            exit(0);
-        }
+    Request *request = request_new(client->buffer);
+    char *response = server_handle_request(server, request);
+    write(client->socket, response, strlen(response) + 1);
 
-        printf("Client says > %s\n", client->buffer);
-        write(client->socket, client->buffer, strlen(client->buffer) + 1);
-    }
+    client_free(client);
+    exit(0);
 }
 
 void server_multiplexed(Server *server)
@@ -156,6 +151,40 @@ void server_multiplexed(Server *server)
         else
             clients = clients->next;
     }
+}
+
+char *server_handle_request(Server *server, Request *req)
+{
+    /*fprintf(stderr, "[-] > server_handle_request\n");
+
+    if(req->method)
+    {
+        if(!strcmp(req->method, "GET"))
+        {
+            Response *res = server->protocol.get(req);
+            return response_serialize(res);
+        }
+        else if(!strcmp(req->method, "BREW"))
+        {
+            Response *res = server->protocol.brew(req);
+            return response_serialize(res);
+        }
+        else if(!strcmp(req->method, "PROPFIND"))
+        {
+            Response *res = server->protocol.propfind(req);
+            return response_serialize(res);
+        }
+        else if(!strcmp(req->method, "WHEN"))
+        {
+            Response *res = server->protocol.when(req);
+            return response_serialize(res);
+        }
+    }
+
+    fprintf(stderr, "[-] < server_handle_request\n");*/
+
+    Response *res = response_new(NOT_ACCEPTABLE, "Invalid method");
+    return response_serialize(res);
 }
 
 void server_free(Server *server)

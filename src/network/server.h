@@ -8,15 +8,18 @@ typedef struct Server {
     int socket;
 
     List *clients;
+    HtcpcpProtocol protocol;
 } Server;
 
-Server *server_new(void);
+Server *server_new(HtcpcpProtocol);
 void server_init(Server*, Config*);
 int server_listen(Server*, Config*);
 
 void server_run(Server*);
 void server_forked(Server*);
 void server_multiplexed(Server*);
+
+char *server_handle_request(Server*, Request*);
 
 void server_free(Server*);
 

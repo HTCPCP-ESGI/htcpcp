@@ -1,4 +1,4 @@
-#include "../../htcpcp.h"
+#include "../../includes.h"
 
 int parse_request(Request*, const char*);
 int parse_method(Request*, char*);
@@ -61,7 +61,10 @@ int parse_request(Request *request, const char *raw)
         str = index + 1;
     }
 
-    request->body = strdup(str);
+    if(str != NULL)
+    {
+        request->body = strdup(str);
+    }
 
     return 1;
 }

@@ -3,7 +3,8 @@
 
 typedef enum {
     OK = 200,
-    BAD_REQUEST = 400
+    NOT_ACCEPTABLE = 406,
+    IM_A_TEAPOT = 418
 } StatusCode;
 
 char *status_code_description(StatusCode);
@@ -17,6 +18,7 @@ typedef struct Response {
 Response *response_new(StatusCode, const char*);
 void response_header(Response*, char*, char*);
 void response_headers(Response*, char*, List*);
+char *response_serialize(Response*);
 void response_free(Response*);
 
 #endif

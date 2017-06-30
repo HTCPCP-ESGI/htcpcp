@@ -2,7 +2,7 @@
 
 Response *teapot(Request *req)
 {
-    return response_new(IM_A_TEAPOT, req->body);
+    return response_new(IM_A_TEAPOT, "");
 }
 
 int main(int argc, char **argv)

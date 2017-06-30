@@ -24,8 +24,10 @@ void htcpcp_run(HtcpcpProtocol protocol, Config *config)
     {
         printf("[+] Server mode\n");
 
-        server_listen(server, config);
-        server_run(server);
+        if(server_listen(server, config))
+        {
+            server_run(server);
+        }
     }
     else
     {
@@ -37,6 +39,6 @@ void htcpcp_run(HtcpcpProtocol protocol, Config *config)
         client_free(client);
     }
 
-    printf("[~] Cleaning resources...");
+    printf("[~] Cleaning resources...\n");
     server_free(server);
 }

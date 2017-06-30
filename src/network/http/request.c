@@ -16,7 +16,10 @@ Request *request_new(const char *raw)
         request->body = NULL;
 
         if(!parse_request(request, raw))
+        {
+            fprintf(stderr, "[-] Failed to parse request\n");
             return NULL;
+        }
     }
 
     return request;
@@ -55,13 +58,13 @@ int parse_request(Request *request, const char *raw)
             method_parsed = 1;
         }
         // Parse headers
-        else if(!parse_header(request, line))
-            return 0;
+        else
+            parse_header(request, line);
 
         str = index + 1;
     }
 
-    if(str != NULL)
+    if(str)
     {
         request->body = strdup(str);
     }
@@ -111,7 +114,7 @@ int parse_header(Request *request, char *line)
 
     // Parse header values
     List *values = NULL;
-    while((index = strpbrk(line, ",")) == NULL)
+    while((index = strpbrk(line, ",")) != NULL)
     {
         size = index - line;
         char *value = malloc(size + 1);
@@ -123,7 +126,10 @@ int parse_header(Request *request, char *line)
     }
 
     // Only one value OR last value of the list
-    list_add(&values, strdup(line));
+    if(line)
+    {
+        list_add(&values, strdup(line));
+    }
 
     // Add the (key, values) header to the request's map
     map_put(request->headers, key, &values, sizeof(values));

@@ -155,36 +155,40 @@ void server_multiplexed(Server *server)
 
 char *server_handle_request(Server *server, Request *req)
 {
-    /*fprintf(stderr, "[-] > server_handle_request\n");
-
-    if(req->method)
+    if(req)
     {
-        if(!strcmp(req->method, "GET"))
+        if(req->method)
         {
-            Response *res = server->protocol.get(req);
-            return response_serialize(res);
+            if(!strcmp(req->method, "GET"))
+            {
+                Response *res = server->protocol.get(req);
+                return response_serialize(res);
+            }
+            else if(!strcmp(req->method, "BREW"))
+            {
+                Response *res = server->protocol.brew(req);
+                return response_serialize(res);
+            }
+            else if(!strcmp(req->method, "PROPFIND"))
+            {
+                Response *res = server->protocol.propfind(req);
+                return response_serialize(res);
+            }
+            else if(!strcmp(req->method, "WHEN"))
+            {
+                Response *res = server->protocol.when(req);
+                return response_serialize(res);
+            }
         }
-        else if(!strcmp(req->method, "BREW"))
-        {
-            Response *res = server->protocol.brew(req);
-            return response_serialize(res);
-        }
-        else if(!strcmp(req->method, "PROPFIND"))
-        {
-            Response *res = server->protocol.propfind(req);
-            return response_serialize(res);
-        }
-        else if(!strcmp(req->method, "WHEN"))
-        {
-            Response *res = server->protocol.when(req);
-            return response_serialize(res);
-        }
+
+        Response *res = response_new(NOT_ACCEPTABLE, "Invalid method");
+        return response_serialize(res);
     }
-
-    fprintf(stderr, "[-] < server_handle_request\n");*/
-
-    Response *res = response_new(NOT_ACCEPTABLE, "Invalid method");
-    return response_serialize(res);
+    else
+    {
+        Response *res = response_new(NOT_ACCEPTABLE, "Invalid request");
+        return response_serialize(res);
+    }
 }
 
 void server_free(Server *server)

@@ -33,9 +33,11 @@ void htcpcp_run(HtcpcpProtocol protocol, Config *config)
         if(config->method && config->resource)
         {
             Client *client = client_new();
-            client_connect(client, server);
-            client_run(client, config);
-            client_free(client);
+            if(client_connect(client, server))
+            {
+                client_run(client, config);
+                client_free(client);
+            }
         }
         else
         {

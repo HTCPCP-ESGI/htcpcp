@@ -73,13 +73,14 @@ void server_forked(Server *server)
         return;
 
     read(client->socket, client->buffer, CLIENT_BUFFER_SIZE);
-    printf("[+] Client says > %s", client->buffer);
+    printf("[+] Received request > %s", client->buffer);
 
     Request *request = request_new(client->buffer);
     char *response = server_handle_request(server, request);
     write(client->socket, response, strlen(response) + 1);
 
     client_free(client);
+    free(response);
     exit(0);
 }
 

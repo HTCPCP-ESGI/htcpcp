@@ -4,6 +4,21 @@ int parse_request(Request*, const char*);
 int parse_method(Request*, char*);
 int parse_header(Request*, char*);
 
+Request *request_raw(const char *method, const char *resource, const char *body)
+{
+    Request *request = malloc(sizeof(Request));
+
+    if(request)
+    {
+        request->method = strdup(method);
+        request->resource = strdup(resource);
+        request->headers = map_create();
+        request->body = strdup(body);
+    }
+
+    return request;
+}
+
 Request *request_new(const char *raw)
 {
     Request *request = malloc(sizeof(Request));
@@ -135,6 +150,15 @@ int parse_header(Request *request, char *line)
     map_put(request->headers, key, &values, sizeof(values));
 
     return 1;
+}
+
+char *request_serialize(Request *request)
+{
+    size_t size = strlen(request->method) + 1 /* space */ + strlen(request->resource) + 2 /* \n\n */ + strlen(request->body) + 1 /* \0 */;
+    char *serialized = malloc(size);
+
+    sprintf(serialized, "%s %s\n\n%s", request->method, request->resource, request->body);
+    return serialized;
 }
 
 void request_free(Request *request)

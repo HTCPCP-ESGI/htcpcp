@@ -14,7 +14,7 @@ typedef struct Client {
 
 Client *client_new(void);
 int client_connect(Client*, Server*);
-void client_run(Client*);
+void client_run(Client*, Config*);
 void client_free(Client*);
 
 #endif

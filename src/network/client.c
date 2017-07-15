@@ -29,13 +29,16 @@ int client_connect(Client *client, Server *server)
     return 1;
 }
 
-void client_run(Client *client)
+void client_run(Client *client, Config *config)
 {
-    fgets(client->buffer, CLIENT_BUFFER_SIZE, stdin);
-    write(client->socket, client->buffer, strlen(client->buffer) + 1);
+    Request *request = request_raw(config->method, config->resource, config->body);
+    char *serialized = request_serialize(request);
 
+    write(client->socket, serialized, strlen(serialized) + 1);
     read(client->socket, client->buffer, CLIENT_BUFFER_SIZE);
+
     printf("%s", client->buffer);
+    free(serialized);
 }
 
 void client_free(Client *client)

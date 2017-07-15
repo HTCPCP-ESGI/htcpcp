@@ -4,7 +4,6 @@ int htcpcp_init(int argc, char **argv, HtcpcpProtocol protocol)
 {
     Config *config = config_new();
 
-    printf("[~] Starting HTCPCP...\n");
     if(parse_opts(config, argc, argv))
     {
         htcpcp_run(protocol, config);
@@ -22,7 +21,7 @@ void htcpcp_run(HtcpcpProtocol protocol, Config *config)
 
     if(config->is_server)
     {
-        printf("[+] Server mode\n");
+        printf("[+] Server listening on port %d\n", config->port);
 
         if(server_listen(server, config))
         {
@@ -31,14 +30,18 @@ void htcpcp_run(HtcpcpProtocol protocol, Config *config)
     }
     else
     {
-        printf("[+] Client mode\n");
-
-        Client *client = client_new();
-        client_connect(client, server);
-        client_run(client);
-        client_free(client);
+        if(config->method && config->resource)
+        {
+            Client *client = client_new();
+            client_connect(client, server);
+            client_run(client, config);
+            client_free(client);
+        }
+        else
+        {
+            fprintf(stderr, "[-] You have to specify a method (-m) and resource (-r)\n");
+        }
     }
 
-    printf("[~] Cleaning resources...\n");
     server_free(server);
 }

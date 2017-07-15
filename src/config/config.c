@@ -1,6 +1,6 @@
 #include "../includes.h"
 
-#define HTCPCP_OPTS "a:p:d"
+#define HTCPCP_OPTS "da:p:m:r:b:"
 
 Config *config_new(void)
 {
@@ -12,6 +12,10 @@ Config *config_new(void)
         config->address = NULL;
         config->port = 0;
         config->connection_queue_length = DEFAULT_CONNECTION_QUEUE_LENGTH;
+
+        config->method = NULL;
+        config->resource = NULL;
+        config->body = DEFAULT_BODY;
     }
 
     return config;
@@ -49,6 +53,21 @@ int parse_opts(Config *config, int argc, char **argv)
                 config->is_server = 1;
                 break;
 
+            case 'm':
+                config->method = malloc(strlen(optarg) + 1);
+                sprintf(config->method, "%s", optarg);
+                break;
+
+            case 'r':
+                config->resource = malloc(strlen(optarg) + 1);
+                sprintf(config->resource, "%s", optarg);
+                break;
+
+            case 'b':
+                config->body = malloc(strlen(optarg) + 1);
+                sprintf(config->body, "%s", optarg);
+                break;
+
             case '?':
                 if(optopt == 'a' || optopt == 'p')
                     fprintf(stderr, "[-] Option -%c requires an argument\n", optopt);
@@ -68,5 +87,9 @@ void config_free(Config *config)
 {
     if(config->address)
         free(config->address);
+    if(config->method)
+        free(config->method);
+    if(config->resource)
+        free(config->resource);
     free(config);
 }

@@ -1,6 +1,6 @@
 #include "../includes.h"
 
-#define HTCPCP_OPTS "da:p:m:r:b:"
+#define HTCPCP_OPTS "da:p:m:r:b:h:"
 
 Config *config_new(void)
 {
@@ -16,6 +16,7 @@ Config *config_new(void)
         config->method = NULL;
         config->resource = NULL;
         config->body = DEFAULT_BODY;
+        config->headers = map_create();
     }
 
     return config;
@@ -68,6 +69,29 @@ int parse_opts(Config *config, int argc, char **argv)
                 sprintf(config->body, "%s", optarg);
                 break;
 
+            // -h "Key=Value"
+            case 'h':
+            {
+                char *index = strpbrk(optarg, "=");
+                if(!index)
+                    break;
+
+                int key_size = index - optarg;
+                char *key = malloc(key_size + 1);
+                int value_size = strlen(optarg) - key_size - 1;
+                char *value = malloc(value_size + 1);
+
+                memset(key, 0, key_size + 1);
+                strncpy(key, optarg, key_size);
+                memset(value, 0, value_size + 1);
+                strncpy(value, optarg + key_size + 1, value_size);
+
+                map_put(config->headers, key, value, strlen(value) + 1);
+                free(key);
+                free(value);
+                break;
+             }
+
             case '?':
                 if(optopt == 'a' || optopt == 'p')
                     fprintf(stderr, "[-] Option -%c requires an argument\n", optopt);
@@ -91,5 +115,7 @@ void config_free(Config *config)
         free(config->method);
     if(config->resource)
         free(config->resource);
+
+    map_free(&config->headers);
     free(config);
 }

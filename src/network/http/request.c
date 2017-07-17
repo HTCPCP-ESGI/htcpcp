@@ -4,7 +4,7 @@ int parse_request(Request*, const char*);
 int parse_method(Request*, char*);
 int parse_header(Request*, char*);
 
-Request *request_raw(const char *method, const char *resource, const char *body)
+Request *request_raw(const char *method, const char *resource, const char *body, HashMap *headers)
 {
     Request *request = malloc(sizeof(Request));
 
@@ -12,7 +12,7 @@ Request *request_raw(const char *method, const char *resource, const char *body)
     {
         request->method = strdup(method);
         request->resource = strdup(resource);
-        request->headers = map_create();
+        request->headers = map_duplicate(headers);
         request->body = strdup(body);
     }
 
@@ -154,10 +154,52 @@ int parse_header(Request *request, char *line)
 
 char *request_serialize(Request *request)
 {
-    size_t size = strlen(request->method) + 1 /* space */ + strlen(request->resource) + 2 /* \n\n */ + strlen(request->body) + 1 /* \0 */;
-    char *serialized = malloc(size);
+    size_t i;
+    size_t size = strlen(request->method) + 1 /* space */ + strlen(request->resource) + 3 /* \n\n\n */ + strlen(request->body) + 1 /* \0 */;
 
-    sprintf(serialized, "%s %s\n\n%s", request->method, request->resource, request->body);
+    for(i = 0 ; i < request->headers->slots ; i++)
+    {
+        HashMapEntry *attribute = request->headers->entries[i];
+
+        if(!attribute)
+            continue;
+
+        while(attribute)
+        {
+            char *value = map_get(request->headers, attribute->key);
+
+            // If the attribute exists
+            if(value)
+                size += strlen(attribute->key) + 2 /* :_ */ + strlen(value) + 1 /* \n */;
+            // Go to next attribute
+            attribute = attribute->next;
+        }
+    }
+
+    char *serialized = malloc(size);
+    sprintf(serialized, "%s %s\n", request->method, request->resource);
+
+    for(i = 0 ; i < request->headers->slots ; i++)
+    {
+        HashMapEntry *attribute = request->headers->entries[i];
+
+        if(!attribute)
+            continue;
+
+        while(attribute)
+        {
+            char *value = map_get(request->headers, attribute->key);
+
+            // If the attribute exists
+            if(value)
+                sprintf(serialized, "%s%s: %s\n", serialized, attribute->key, value);
+            // Go to next attribute
+            attribute = attribute->next;
+        }
+    }
+
+    sprintf(serialized, "%s\n%s\n", serialized, request->body);
+
     return serialized;
 }
 

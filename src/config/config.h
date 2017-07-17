@@ -14,6 +14,7 @@ typedef struct Config {
     char *method;
     char *resource;
     char *body;
+    HashMap *headers;
 } Config;
 
 Config *config_new(void);

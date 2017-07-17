@@ -130,6 +130,33 @@ void map_remove(HashMap *map, char *key)
 	}
 }
 
+HashMap *map_duplicate(HashMap *src)
+{
+	size_t i;
+	HashMap *map = map_create();
+
+    for(i = 0 ; i < src->slots ; i++)
+    {
+        HashMapEntry *attribute = src->entries[i];
+
+        if(!attribute)
+            continue;
+
+        while(attribute)
+        {
+            char *value = map_get(src, attribute->key);
+
+            // If the attribute exists, put it in the duplicate map
+            if(value)
+                map_put(map, attribute->key, value, strlen(value) + 1);
+            // Go to next attribute
+            attribute = attribute->next;
+        }
+    }
+
+	return map;
+}
+
 void map_free(HashMap **map)
 {
 	size_t i;

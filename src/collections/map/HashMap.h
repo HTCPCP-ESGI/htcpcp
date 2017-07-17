@@ -19,6 +19,7 @@ int map_hashcode(char*);
 void map_put(HashMap*, char*, void*, size_t);
 void *map_get(HashMap*, char*);
 void map_remove(HashMap*, char*);
+HashMap *map_duplicate(HashMap *src);
 void map_free(HashMap**);
 
 #endif	/* HASHMAP_H */

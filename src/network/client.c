@@ -31,7 +31,7 @@ int client_connect(Client *client, Server *server)
 
 void client_run(Client *client, Config *config)
 {
-    Request *request = request_raw(config->method, config->resource, config->body);
+    Request *request = request_raw(config->method, config->resource, config->body, config->headers);
     char *serialized = request_serialize(request);
 
     write(client->socket, serialized, strlen(serialized) + 1);
